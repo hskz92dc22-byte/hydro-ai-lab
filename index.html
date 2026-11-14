@@ -18,49 +18,165 @@
 
 *{box-sizing:border-box}
 
-body{margin:0;background:#101827;color:#edf4ff;font-family:Arial,sans-serif}
+body{
 
-header{padding:18px;background:#172438;border-bottom:1px solid #30435b}
+  margin:0;background:#101827;color:#edf4ff;
+
+  font-family:Arial,"Noto Sans TC",sans-serif
+
+}
+
+header{
+
+  padding:16px;background:#172438;
+
+  border-bottom:1px solid #30435b
+
+}
 
 h1{font-size:21px;margin:0}
 
 header p{font-size:12px;color:#9db1ca;margin:7px 0 0}
 
-main{padding:14px;max-width:900px;margin:auto}
+main{padding:12px;max-width:1000px;margin:auto}
 
-.panel{background:#1b2a40;border:1px solid #354b66;border-radius:12px;padding:14px;margin-bottom:14px}
+.panel{
+
+  background:#1b2a40;border:1px solid #354b66;
+
+  border-radius:12px;padding:14px;margin-bottom:14px
+
+}
 
 h2{font-size:16px;margin:0 0 12px}
 
-button{border:0;border-radius:8px;padding:12px;background:#2878d0;color:white;font-weight:bold}
+button{
+
+  border:0;border-radius:8px;padding:11px 12px;
+
+  background:#2878d0;color:white;font-weight:bold;
+
+  cursor:pointer
+
+}
 
 button:active{opacity:.7}
 
-.controls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+button.secondary{background:#40536c}
 
-input{width:100%;padding:10px;border-radius:7px;border:1px solid #53677e;background:#101d30;color:white}
+button.danger{background:#a94444}
 
-label{font-size:12px;color:#b9c9dc;display:block;margin-bottom:6px}
+.controls{
 
-.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px
+
+}
+
+.toolbox{
+
+  display:grid;grid-template-columns:repeat(4,1fr);gap:7px
+
+}
+
+.toolbox button{font-size:12px;padding:10px 4px}
+
+.fields{
+
+  display:grid;grid-template-columns:1fr 1fr;gap:12px
+
+}
+
+label{
+
+  font-size:12px;color:#b9c9dc;
+
+  display:block;margin-bottom:6px
+
+}
+
+input,select{
+
+  width:100%;padding:10px;border-radius:7px;
+
+  border:1px solid #53677e;background:#101d30;color:white
+
+}
 
 .metric{background:#101d30;border-radius:8px;padding:12px}
 
-.metric strong{display:block;font-size:21px;color:#59c5ff;margin-top:5px}
+.metric strong{
 
-svg{width:100%;height:auto;background:#f4f7fa;border-radius:8px}
+  display:block;font-size:20px;color:#59c5ff;margin-top:5px
 
-.pipe{fill:none;stroke:#8797a8;stroke-width:5}
-
-.active{stroke:#08a8e8;stroke-dasharray:10 7;animation:flow .7s linear infinite}
-
-@keyframes flow{to{stroke-dashoffset:-34}}
-
-.symbol{stroke:#27384c;stroke-width:2;fill:white}
+}
 
 .status{color:#70d8ff;font-weight:bold}
 
 .note{font-size:12px;color:#aebed0;line-height:1.6}
+
+#canvas{
+
+  display:block;width:100%;height:auto;
+
+  background:#f4f7fa;border-radius:8px;
+
+  touch-action:none
+
+}
+
+.node{cursor:grab}
+
+.node:active{cursor:grabbing}
+
+.node.selected .body{stroke:#08a8e8;stroke-width:4}
+
+.body{fill:white;stroke:#27384c;stroke-width:2}
+
+.symbol-text{
+
+  fill:#27384c;font-size:13px;
+
+  font-weight:bold;pointer-events:none
+
+}
+
+.port{
+
+  fill:#ffb52e;stroke:#27384c;stroke-width:2;
+
+  cursor:crosshair
+
+}
+
+.port.pending{fill:#ff5252}
+
+.pipe{
+
+  fill:none;stroke:#8797a8;stroke-width:5;
+
+  stroke-linecap:round;stroke-linejoin:round
+
+}
+
+.pipe.active{
+
+  stroke:#08a8e8;stroke-dasharray:10 7;
+
+  animation:flow .7s linear infinite
+
+}
+
+@keyframes flow{to{stroke-dashoffset:-34}}
+
+.small{font-size:11px;color:#9db1ca}
+
+@media(max-width:480px){
+
+  .toolbox{grid-template-columns:repeat(2,1fr)}
+
+  .controls button{font-size:12px;padding:10px 3px}
+
+}
 
 </style>
 
@@ -70,9 +186,9 @@ svg{width:100%;height:auto;background:#f4f7fa;border-radius:8px}
 
 <header>
 
-<h1>Hydro AI V2</h1>
+  <h1>Hydro AI V2</h1>
 
-<p>液壓智慧實驗室｜2D 動態油路模擬</p>
+  <p>液壓智慧實驗室｜2D 動態油路模擬與故障分析</p>
 
 </header>
 
@@ -80,139 +196,185 @@ svg{width:100%;height:auto;background:#f4f7fa;border-radius:8px}
 
 <section class="panel">
 
-<h2>液壓系統工作台</h2>
+  <h2>一、液壓元件工具箱</h2>
 
-<div class="controls">
+  <div class="toolbox">
 
-<button onclick="setMode('extend')">油缸伸出</button>
+    <button onclick="addNode('pump')">＋ 泵浦</button>
 
-<button onclick="setMode('neutral')">中位停止</button>
+    <button onclick="addNode('tank')">＋ 油箱</button>
 
-<button onclick="setMode('retract')">油缸縮回</button>
+    <button onclick="addNode('valve')">＋ 方向閥</button>
 
-</div>
+    <button onclick="addNode('cylinder')">＋ 油壓缸</button>
 
-<p>目前狀態：<span class="status" id="status">中位停止</span></p>
+  </div>
 
-<svg viewBox="0 0 340 260" role="img" aria-label="雙動油缸及方向閥液壓迴路">
+  <p class="note">
 
-<!-- 油缸 -->
+    點擊元件按鈕即可新增元件。按住元件並拖曳即可移動。
 
-<rect x="205" y="30" width="105" height="35" rx="4" class="symbol"/>
+    點擊元件上的黃色油口，再點擊另一個黃色油口，即可建立油路。
 
-<rect id="piston" x="212" y="35" width="12" height="25" fill="#2878d0"/>
+  </p>
 
-<line id="rod" x1="224" y1="47" x2="260" y2="47" stroke="#27384c" stroke-width="5"/>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
 
-<text x="205" y="22" font-size="10" fill="#27384c">雙動油缸</text>
+    <button class="secondary" onclick="deleteSelected()">刪除選取元件</button>
 
-<!-- 方向閥 -->
+    <button class="secondary" onclick="resetSystem()">恢復初始油路</button>
 
-<rect x="115" y="105" width="55" height="55" class="symbol"/>
-
-<rect x="170" y="105" width="55" height="55" class="symbol"/>
-
-<path d="M122 150 L160 115 M153 115 L160 115 L160 122" stroke="#27384c" fill="none" stroke-width="2"/>
-
-<path d="M178 115 L215 150 M208 150 L215 150 L215 143" stroke="#27384c" fill="none" stroke-width="2"/>
-
-<text x="132" y="176" font-size="10" fill="#27384c">4/3 方向閥</text>
-
-<!-- 泵浦和油箱 -->
-
-<circle cx="42" cy="125" r="18" class="symbol"/>
-
-<path d="M34 134 L50 125 L34 116 Z" fill="#2878d0"/>
-
-<text x="28" y="155" font-size="10" fill="#27384c">泵浦</text>
-
-<path d="M20 205 L64 205 L58 225 L26 225 Z" class="symbol"/>
-
-<text x="30" y="240" font-size="10" fill="#27384c">油箱</text>
-
-<!-- 管線 -->
-
-<path id="pLine" class="pipe" d="M60 125 H115"/>
-
-<path id="tLine" class="pipe" d="M115 150 H80 V215 H64"/>
-
-<path id="aLine" class="pipe" d="M142 105 V80 H205"/>
-
-<path id="bLine" class="pipe" d="M198 105 V90 H285 V65"/>
-
-<text x="75" y="116" font-size="11" fill="#27384c">P</text>
-
-<text x="84" y="169" font-size="11" fill="#27384c">T</text>
-
-<text x="150" y="78" font-size="11" fill="#27384c">A</text>
-
-<text x="270" y="84" font-size="11" fill="#27384c">B</text>
-
-</svg>
-
-<p class="note">藍色虛線代表目前設定的模擬油流路徑。此為教學用簡化示意，尚未包含完整閥芯中位機能與負載模型。</p>
+  </div>
 
 </section>
 
 <section class="panel">
 
-<h2>模擬參數</h2>
+  <h2>二、2D 油路編輯畫布</h2>
 
-<div class="fields">
+  <svg id="canvas" viewBox="0 0 800 450"
 
-<div><label>系統壓力（bar）</label><input id="pressure" type="number" value="100" min="0"></div>
+       role="img" aria-label="液壓油路編輯畫布">
 
-<div><label>泵浦流量（L/min）</label><input id="flow" type="number" value="20" min="0"></div>
+    <g id="drawing"></g>
 
-<div><label>油缸缸徑（mm）</label><input id="bore" type="number" value="80" min="1"></div>
+  </svg>
 
-<div><label>活塞桿直徑（mm）</label><input id="rodSize" type="number" value="40" min="0"></div>
+  <p id="connectionStatus" class="note">
 
-</div>
+    尚未選取油口。點擊兩個黃色油口建立連線。
 
-<button style="width:100%;margin-top:12px" onclick="calculate()">重新計算</button>
+  </p>
 
-</section>
+  <p class="small">
 
-<section class="panel">
+    藍色虛線代表目前模擬中的油路。黃色圓點代表可連接油口。
 
-<h2>運算結果</h2>
-
-<div class="fields">
-
-<div class="metric">伸出速度<strong id="extendSpeed">—</strong></div>
-
-<div class="metric">縮回速度<strong id="retractSpeed">—</strong></div>
-
-<div class="metric">系統壓力<strong id="pressureValue">100 bar</strong></div>
-
-<div class="metric">泵浦流量<strong id="flowValue">20 L/min</strong></div>
-
-</div>
+  </p>
 
 </section>
 
 <section class="panel">
 
-<h2>手動故障測試</h2>
+  <h2>三、液壓系統操作</h2>
 
-<label>選擇模擬故障</label>
+  <div class="controls">
 
-<select id="fault" style="width:100%;padding:10px;border-radius:7px">
+    <button onclick="setMode('extend')">油缸伸出</button>
 
-<option value="none">正常狀態</option>
+    <button class="secondary" onclick="setMode('neutral')">中位停止</button>
 
-<option value="leak">模擬內漏</option>
+    <button onclick="setMode('retract')">油缸縮回</button>
 
-<option value="lowflow">模擬流量不足</option>
+  </div>
 
-<option value="stuck">模擬方向閥卡滯</option>
+  <p>目前狀態：<span class="status" id="status">中位停止</span></p>
 
-</select>
+</section>
 
-<button style="width:100%;margin-top:10px" onclick="diagnose()">執行故障分析</button>
+<section class="panel">
 
-<p id="diagnosis" class="note">等待故障測試。</p>
+  <h2>四、模擬參數</h2>
+
+  <div class="fields">
+
+    <div>
+
+      <label>系統壓力（bar）</label>
+
+      <input id="pressure" type="number" value="100" min="0">
+
+    </div>
+
+    <div>
+
+      <label>泵浦流量（L/min）</label>
+
+      <input id="flow" type="number" value="20" min="0">
+
+    </div>
+
+    <div>
+
+      <label>油缸缸徑（mm）</label>
+
+      <input id="bore" type="number" value="80" min="1">
+
+    </div>
+
+    <div>
+
+      <label>活塞桿直徑（mm）</label>
+
+      <input id="rodSize" type="number" value="40" min="0">
+
+    </div>
+
+  </div>
+
+  <button style="width:100%;margin-top:12px" onclick="calculate()">
+
+    重新計算
+
+  </button>
+
+</section>
+
+<section class="panel">
+
+  <h2>五、運算結果</h2>
+
+  <div class="fields">
+
+    <div class="metric">伸出速度<strong id="extendSpeed">—</strong></div>
+
+    <div class="metric">縮回速度<strong id="retractSpeed">—</strong></div>
+
+    <div class="metric">伸出理論推力<strong id="extendForce">—</strong></div>
+
+    <div class="metric">縮回理論推力<strong id="retractForce">—</strong></div>
+
+    <div class="metric">系統壓力<strong id="pressureValue">100 bar</strong></div>
+
+    <div class="metric">泵浦流量<strong id="flowValue">20 L/min</strong></div>
+
+  </div>
+
+  <p class="note">
+
+    計算結果為理論值，未扣除摩擦、背壓、容積效率及機械損失。
+
+  </p>
+
+</section>
+
+<section class="panel">
+
+  <h2>六、手動故障分析</h2>
+
+  <label>選擇模擬故障</label>
+
+  <select id="fault">
+
+    <option value="none">正常狀態</option>
+
+    <option value="leak">模擬內漏</option>
+
+    <option value="lowflow">模擬流量不足</option>
+
+    <option value="stuck">模擬方向閥卡滯</option>
+
+    <option value="pressure">模擬壓力不足</option>
+
+  </select>
+
+  <button style="width:100%;margin-top:10px" onclick="diagnose()">
+
+    執行故障分析
+
+  </button>
+
+  <p id="diagnosis" class="note">等待故障測試。</p>
 
 </section>
 
@@ -220,107 +382,739 @@ svg{width:100%;height:auto;background:#f4f7fa;border-radius:8px}
 
 <script>
 
+/* =========================
+
+   1. 系統資料
+
+========================= */
+
+let nodes=[];
+
+let connections=[];
+
+let nextId=1;
+
+let selected=null;
+
+let pendingPort=null;
+
+let drag=null;
+
 let mode='neutral';
+
+const svg=document.getElementById('canvas');
+
+const drawing=document.getElementById('drawing');
+
+const portDefinitions={
+
+  pump:{
+
+    out:{x:100,y:35,label:'P'}
+
+  },
+
+  tank:{
+
+    in:{x:100,y:35,label:'T'}
+
+  },
+
+  valve:{
+
+    P:{x:0,y:38,label:'P'},
+
+    T:{x:0,y:78,label:'T'},
+
+    A:{x:140,y:38,label:'A'},
+
+    B:{x:140,y:78,label:'B'}
+
+  },
+
+  cylinder:{
+
+    A:{x:35,y:0,label:'A'},
+
+    B:{x:105,y:0,label:'B'}
+
+  }
+
+};
+
+const dimensions={
+
+  pump:{w:100,h:70},
+
+  tank:{w:100,h:70},
+
+  valve:{w:140,h:110},
+
+  cylinder:{w:150,h:80}
+
+};
+
+function createNode(type,x,y){
+
+  return {
+
+    id:nextId++,
+
+    type:type,
+
+    x:x,
+
+    y:y
+
+  };
+
+}
+
+/* =========================
+
+   2. 初始油路
+
+========================= */
+
+function resetSystem(){
+
+  nodes=[];
+
+  connections=[];
+
+  nextId=1;
+
+  selected=null;
+
+  pendingPort=null;
+
+  drag=null;
+
+  const pump=createNode('pump',55,160);
+
+  const tank=createNode('tank',55,325);
+
+  const valve=createNode('valve',330,180);
+
+  const cylinder=createNode('cylinder',600,115);
+
+  nodes.push(pump,tank,valve,cylinder);
+
+  connect(pump.id,'out',valve.id,'P');
+
+  connect(valve.id,'T',tank.id,'in');
+
+  connect(valve.id,'A',cylinder.id,'A');
+
+  connect(valve.id,'B',cylinder.id,'B');
+
+  render();
+
+  setMode('neutral');
+
+}
+
+/* =========================
+
+   3. 新增及刪除元件
+
+========================= */
+
+function addNode(type){
+
+  const x=230+Math.random()*180;
+
+  const y=80+Math.random()*220;
+
+  const n=createNode(type,x,y);
+
+  nodes.push(n);
+
+  selected=n.id;
+
+  render();
+
+}
+
+function deleteSelected(){
+
+  if(selected===null){
+
+    alert('請先選取要刪除的元件。');
+
+    return;
+
+  }
+
+  nodes=nodes.filter(n=>n.id!==selected);
+
+  connections=connections.filter(c=>
+
+    c.a!==selected && c.b!==selected
+
+  );
+
+  selected=null;
+
+  pendingPort=null;
+
+  render();
+
+}
+
+/* =========================
+
+   4. 油路連線
+
+========================= */
+
+function connect(a,pa,b,pb){
+
+  const exists=connections.some(c=>
+
+    (c.a===a&&c.pa===pa&&c.b===b&&c.pb===pb)||
+
+    (c.a===b&&c.pa===pb&&c.b===a&&c.pb===pa)
+
+  );
+
+  if(!exists){
+
+    connections.push({a:a,pa:pa,b:b,pb:pb});
+
+  }
+
+}
+
+function getPortPosition(nodeId,portName){
+
+  const n=nodes.find(x=>x.id===nodeId);
+
+  if(!n)return null;
+
+  const p=portDefinitions[n.type][portName];
+
+  if(!p)return null;
+
+  return {
+
+    x:n.x+p.x,
+
+    y:n.y+p.y
+
+  };
+
+}
+
+function handleCanvasClick(e){
+
+  const port=e.target.closest('.port');
+
+  if(!port)return;
+
+  const nodeId=Number(port.dataset.node);
+
+  const portName=port.dataset.port;
+
+  if(!pendingPort){
+
+    pendingPort={nodeId:nodeId,portName:portName};
+
+    document.getElementById('connectionStatus').textContent=
+
+      '已選取第一個油口，請再點擊另一個元件的油口。';
+
+    render();
+
+    return;
+
+  }
+
+  if(
+
+    pendingPort.nodeId===nodeId &&
+
+    pendingPort.portName===portName
+
+  ){
+
+    pendingPort=null;
+
+    document.getElementById('connectionStatus').textContent=
+
+      '已取消油口選取。';
+
+    render();
+
+    return;
+
+  }
+
+  if(pendingPort.nodeId===nodeId){
+
+    document.getElementById('connectionStatus').textContent=
+
+      '請選擇另一個元件的油口。';
+
+    return;
+
+  }
+
+  connect(
+
+    pendingPort.nodeId,
+
+    pendingPort.portName,
+
+    nodeId,
+
+    portName
+
+  );
+
+  pendingPort=null;
+
+  document.getElementById('connectionStatus').textContent=
+
+    '油路連線已建立。';
+
+  render();
+
+}
+
+/* =========================
+
+   5. 元件拖曳功能
+
+========================= */
+
+function startDrag(e){
+
+  if(e.target.closest('.port'))return;
+
+  const group=e.target.closest('.node');
+
+  if(!group)return;
+
+  e.preventDefault();
+
+  const id=Number(group.dataset.id);
+
+  const n=nodes.find(x=>x.id===id);
+
+  if(!n)return;
+
+  selected=id;
+
+  const pt=svg.createSVGPoint();
+
+  pt.x=e.clientX;
+
+  pt.y=e.clientY;
+
+  const matrix=svg.getScreenCTM();
+
+  if(!matrix)return;
+
+  const p=pt.matrixTransform(matrix.inverse());
+
+  drag={
+
+    id:id,
+
+    dx:p.x-n.x,
+
+    dy:p.y-n.y
+
+  };
+
+  render();
+
+  window.addEventListener('pointermove',moveDrag);
+
+  window.addEventListener('pointerup',endDrag);
+
+  window.addEventListener('pointercancel',endDrag);
+
+}
+
+function moveDrag(e){
+
+  if(!drag)return;
+
+  const matrix=svg.getScreenCTM();
+
+  if(!matrix)return;
+
+  const pt=svg.createSVGPoint();
+
+  pt.x=e.clientX;
+
+  pt.y=e.clientY;
+
+  const p=pt.matrixTransform(matrix.inverse());
+
+  const n=nodes.find(x=>x.id===drag.id);
+
+  if(!n)return;
+
+  const size=dimensions[n.type];
+
+  n.x=Math.max(5,Math.min(800-size.w,p.x-drag.dx));
+
+  n.y=Math.max(5,Math.min(450-size.h,p.y-drag.dy));
+
+  render();
+
+}
+
+function endDrag(){
+
+  drag=null;
+
+  window.removeEventListener('pointermove',moveDrag);
+
+  window.removeEventListener('pointerup',endDrag);
+
+  window.removeEventListener('pointercancel',endDrag);
+
+}
+
+/* =========================
+
+   6. 元件圖形
+
+========================= */
+
+function drawSymbol(n){
+
+  const x=n.x;
+
+  const y=n.y;
+
+  if(n.type==='pump'){
+
+    return `
+
+      <circle cx="50" cy="35" r="22" class="body"/>
+
+      <path d="M40 46 L62 35 L40 24 Z" fill="#2878d0"/>
+
+      <text x="50" y="66" text-anchor="middle" class="symbol-text">泵浦</text>
+
+    `;
+
+  }
+
+  if(n.type==='tank'){
+
+    return `
+
+      <path d="M12 15 H88 L80 52 H20 Z" class="body"/>
+
+      <path d="M20 35 H80" stroke="#2878d0" stroke-width="4"/>
+
+      <text x="50" y="66" text-anchor="middle" class="symbol-text">油箱</text>
+
+    `;
+
+  }
+
+  if(n.type==='valve'){
+
+    return `
+
+      <rect x="0" y="10" width="70" height="75" class="body"/>
+
+      <rect x="70" y="10" width="70" height="75" class="body"/>
+
+      <path d="M10 75 L55 22 M48 22 H55 V29"
+
+        stroke="#27384c" stroke-width="3" fill="none"/>
+
+      <path d="M85 22 L130 75 M123 75 H130 V68"
+
+        stroke="#27384c" stroke-width="3" fill="none"/>
+
+      <text x="70" y="105" text-anchor="middle" class="symbol-text">4/3方向閥</text>
+
+    `;
+
+  }
+
+  if(n.type==='cylinder'){
+
+    return `
+
+      <rect x="12" y="20" width="126" height="35" rx="4" class="body"/>
+
+      <rect x="22" y="25" width="12" height="25" fill="#2878d0"/>
+
+      <line x1="34" y1="37" x2="145" y2="37"
+
+        stroke="#27384c" stroke-width="5"/>
+
+      <text x="75" y="75" text-anchor="middle" class="symbol-text">雙動油缸</text>
+
+    `;
+
+  }
+
+  return '';
+
+}
+
+function renderNode(n){
+
+  const ports=portDefinitions[n.type];
+
+  let portHTML='';
+
+  Object.keys(ports).forEach(name=>{
+
+    const p=ports[name];
+
+    const isPending=
+
+      pendingPort &&
+
+      pendingPort.nodeId===n.id &&
+
+      pendingPort.portName===name;
+
+    portHTML+=`
+
+      <circle
+
+        class="port ${isPending?'pending':''}"
+
+        cx="${p.x}" cy="${p.y}" r="7"
+
+        data-node="${n.id}"
+
+        data-port="${name}"
+
+      />
+
+      <text
+
+        x="${p.x+8}" y="${p.y-9}"
+
+        fill="#27384c" font-size="11"
+
+        pointer-events="none"
+
+      >${p.label}</text>
+
+    `;
+
+  });
+
+  return `
+
+    <g class="node ${selected===n.id?'selected':''}"
+
+       data-id="${n.id}"
+
+       transform="translate(${n.x},${n.y})">
+
+      ${drawSymbol(n)}
+
+      ${portHTML}
+
+    </g>
+
+  `;
+
+}
+
+/* =========================
+
+   7. 畫布重新繪製
+
+========================= */
+
+function render(){
+
+  let html='';
+
+  connections.forEach(c=>{
+
+    const a=getPortPosition(c.a,c.pa);
+
+    const b=getPortPosition(c.b,c.pb);
+
+    if(!a||!b)return;
+
+    const active=mode!=='neutral';
+
+    html+=`
+
+      <line
+
+        x1="${a.x}" y1="${a.y}"
+
+        x2="${b.x}" y2="${b.y}"
+
+        class="pipe ${active?'active':''}"
+
+      />
+
+    `;
+
+  });
+
+  nodes.forEach(n=>{
+
+    html+=renderNode(n);
+
+  });
+
+  drawing.innerHTML=html;
+
+}
+
+svg.addEventListener('pointerdown',startDrag);
+
+svg.addEventListener('click',handleCanvasClick);
+
+/* =========================
+
+   8. 模擬操作
+
+========================= */
 
 function setMode(m){
 
- mode=m;
+  mode=m;
 
- document.getElementById('status').textContent=
+  const status={
 
- m==='extend'?'油缸伸出':m==='retract'?'油缸縮回':'中位停止';
+    extend:'油缸伸出',
 
- ['pLine','tLine','aLine','bLine'].forEach(id=>{
+    neutral:'中位停止',
 
-  document.getElementById(id).setAttribute('class','pipe');
+    retract:'油缸縮回'
 
- });
+  };
 
- if(m==='extend'){
+  document.getElementById('status').textContent=status[m];
 
-  ['pLine','aLine','bLine','tLine'].forEach(id=>
-
-   document.getElementById(id).setAttribute('class','pipe active'));
-
-  document.getElementById('piston').setAttribute('x','245');
-
-  document.getElementById('rod').setAttribute('x1','257');
-
- }else if(m==='retract'){
-
-  ['pLine','aLine','bLine','tLine'].forEach(id=>
-
-   document.getElementById(id).setAttribute('class','pipe active'));
-
-  document.getElementById('piston').setAttribute('x','212');
-
-  document.getElementById('rod').setAttribute('x1','224');
-
- }else{
-
-  document.getElementById('piston').setAttribute('x','212');
-
-  document.getElementById('rod').setAttribute('x1','224');
-
- }
+  render();
 
 }
+
+/* =========================
+
+   9. 液壓計算
+
+========================= */
 
 function calculate(){
 
- const q=Number(document.getElementById('flow').value);
+  const q=Number(document.getElementById('flow').value);
 
- const d=Number(document.getElementById('bore').value);
+  const d=Number(document.getElementById('bore').value);
 
- const r=Number(document.getElementById('rodSize').value);
+  const r=Number(document.getElementById('rodSize').value);
 
- const p=Number(document.getElementById('pressure').value);
+  const p=Number(document.getElementById('pressure').value);
 
- if(![q,d,r,p].every(Number.isFinite)||q<0||d<=0||r<0||r>=d||p<0){
+  if(
 
-  alert('請確認參數：流量、壓力不可為負數，桿徑須小於缸徑。');
+    ![q,d,r,p].every(Number.isFinite)||
 
-  return;
+    q<0||d<=0||r<0||r>=d||p<0
 
- }
+  ){
 
- const area=Math.PI*d*d/4;
+    alert('參數錯誤：請確認流量、壓力及油缸尺寸。');
 
- const annulus=Math.PI*(d*d-r*r)/4;
+    return;
 
- const ext=q*1000000/60/area;
+  }
 
- const ret=q*1000000/60/annulus;
+  const area=Math.PI*d*d/4;
 
- document.getElementById('extendSpeed').textContent=(ext/1000).toFixed(3)+' m/s';
+  const annulus=Math.PI*(d*d-r*r)/4;
 
- document.getElementById('retractSpeed').textContent=(ret/1000).toFixed(3)+' m/s';
+  const flowRate=q*1000000/60;
 
- document.getElementById('pressureValue').textContent=p+' bar';
+  const ext=flowRate/area/1000;
 
- document.getElementById('flowValue').textContent=q+' L/min';
+  const ret=flowRate/annulus/1000;
+
+  const extendForce=p*100000*area/1000000;
+
+  const retractForce=p*100000*annulus/1000000;
+
+  document.getElementById('extendSpeed').textContent=
+
+    ext.toFixed(3)+' m/s';
+
+  document.getElementById('retractSpeed').textContent=
+
+    ret.toFixed(3)+' m/s';
+
+  document.getElementById('extendForce').textContent=
+
+    extendForce.toFixed(2)+' kN';
+
+  document.getElementById('retractForce').textContent=
+
+    retractForce.toFixed(2)+' kN';
+
+  document.getElementById('pressureValue').textContent=p+' bar';
+
+  document.getElementById('flowValue').textContent=q+' L/min';
 
 }
+
+/* =========================
+
+   10. 手動故障分析
+
+========================= */
 
 function diagnose(){
 
- const f=document.getElementById('fault').value;
+  const f=document.getElementById('fault').value;
 
- const messages={
+  const messages={
 
- none:'目前未設定故障。這不代表實體設備已確認正常。',
+    none:
 
- leak:'模擬內漏：可進一步檢查油缸密封、閥內洩及保壓回路。',
+      '目前未設定故障。這不代表實體設備已確認正常。',
 
- lowflow:'模擬流量不足：可檢查泵浦供油、吸油條件、濾芯及節流位置。',
+    leak:
 
- stuck:'模擬方向閥卡滯：可檢查閥芯動作、控制訊號及先導油路。'
+      '模擬內漏：建議檢查油缸密封、方向閥內洩及保壓回路。',
 
- };
+    lowflow:
 
- document.getElementById('diagnosis').textContent=messages[f];
+      '模擬流量不足：建議檢查泵浦供油、吸油條件、濾芯及節流位置。',
+
+    stuck:
+
+      '模擬方向閥卡滯：建議檢查閥芯動作、控制訊號及先導油路。',
+
+    pressure:
+
+      '模擬壓力不足：建議檢查溢流閥設定、泵浦狀態及系統洩漏。'
+
+  };
+
+  document.getElementById('diagnosis').textContent=messages[f];
 
 }
+
+/* =========================
+
+   11. 啟動系統
+
+========================= */
+
+resetSystem();
 
 calculate();
 
